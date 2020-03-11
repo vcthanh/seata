@@ -17,6 +17,7 @@ package io.seata.metrics.exporter;
 
 import java.io.Closeable;
 
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.seata.metrics.registry.Registry;
 
 /**
@@ -26,4 +27,5 @@ import io.seata.metrics.registry.Registry;
  */
 public interface Exporter extends Closeable {
     void setRegistry(Registry registry);
+    void setRegistryPrometheus(PrometheusMeterRegistry registry);
 }

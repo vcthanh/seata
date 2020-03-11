@@ -43,6 +43,23 @@ public class BranchSession implements Lockable, Comparable<BranchSession>, Sessi
 
     private static final int MAX_BRANCH_SESSION_SIZE = StoreConfig.getMaxBranchSessionSize();
 
+    @Override
+    public String toString() {
+        return "BranchSession{" +
+                "xid='" + xid + '\'' +
+                ", transactionId=" + transactionId +
+                ", branchId=" + branchId +
+                ", resourceGroupId='" + resourceGroupId + '\'' +
+                ", resourceId='" + resourceId + '\'' +
+                ", lockKey='" + lockKey + '\'' +
+                ", branchType=" + branchType +
+                ", status=" + status +
+                ", clientId='" + clientId + '\'' +
+                ", applicationData='" + applicationData + '\'' +
+                ", lockHolder=" + lockHolder +
+                '}';
+    }
+
     private static ThreadLocal<ByteBuffer> byteBufferThreadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(
         MAX_BRANCH_SESSION_SIZE));
 
@@ -247,11 +264,6 @@ public class BranchSession implements Lockable, Comparable<BranchSession>, Sessi
      */
     public void setXid(String xid) {
         this.xid = xid;
-    }
-
-    @Override
-    public String toString() {
-        return "BR:" + branchId + "/" + transactionId;
     }
 
     @Override

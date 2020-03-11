@@ -139,7 +139,7 @@ public class ProtostuffUndoLogParser implements UndoLogParser {
 
         @Override
         public FieldType getFieldType() {
-            return FieldType.FIXED64;
+            return FieldType.BYTES;
         }
 
         @Override

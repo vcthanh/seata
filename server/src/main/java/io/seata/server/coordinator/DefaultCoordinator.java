@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.alibaba.druid.support.json.JSONUtils;
 import io.netty.channel.Channel;
 import io.seata.common.thread.NamedThreadFactory;
 import io.seata.common.util.CollectionUtils;
@@ -155,6 +156,7 @@ public class DefaultCoordinator extends AbstractTCInboundHandler implements Tran
         throws TransactionException {
         response.setXid(core.begin(rpcContext.getApplicationId(), rpcContext.getTransactionServiceGroup(),
             request.getTransactionName(), request.getTimeout()));
+        System.out.println("doGlobalBegin >>>>>>>>>>>>>>>>>>");
     }
 
     @Override
@@ -258,6 +260,7 @@ public class DefaultCoordinator extends AbstractTCInboundHandler implements Tran
      */
     protected void handleRetryRollbacking() {
         Collection<GlobalSession> rollbackingSessions = SessionHolder.getRetryRollbackingSessionManager().allSessions();
+
         if (CollectionUtils.isEmpty(rollbackingSessions)) {
             return;
         }

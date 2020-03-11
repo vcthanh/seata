@@ -43,6 +43,11 @@ public class GuavaEventBusTest {
             public TestEvent(int value) {
                 this.value = value;
             }
+
+            @Override
+            public String getKey() {
+                return null;
+            }
         }
 
         class TestSubscriber {

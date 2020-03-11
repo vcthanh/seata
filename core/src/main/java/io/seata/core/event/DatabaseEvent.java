@@ -13,19 +13,37 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package io.seata.config.custom;
-
-import io.seata.common.loader.LoadLevel;
-import io.seata.config.Configuration;
-import io.seata.config.ConfigurationProvider;
+package io.seata.core.event;
 
 /**
  * @author phuctt4
  */
-@LoadLevel(name = "Custom", order = 1)
-public class CustomConfigurationProvider implements ConfigurationProvider {
+
+public class DatabaseEvent implements Event {
+    private final long beginTime;
+    private final long endTime;
+    private final OperationEvent operation;
+
+    public DatabaseEvent(long beginTime, long endTime, OperationEvent operation) {
+        this.beginTime = beginTime;
+        this.endTime = endTime;
+        this.operation = operation;
+    }
+
+    public long getBeginTime() {
+        return beginTime;
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public OperationEvent getOperation() {
+        return operation;
+    }
+
     @Override
-    public Configuration provide() {
-        return CustomConfiguration.getInstance();
+    public String getKey() {
+        return operation.toString();
     }
 }

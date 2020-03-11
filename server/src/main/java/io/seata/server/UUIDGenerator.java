@@ -19,6 +19,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 
 import io.seata.common.exception.ShouldNeverHappenException;
@@ -40,7 +43,7 @@ public class UUIDGenerator {
      *
      * @return the long
      */
-    public static long generateUUID() {
+    public synchronized static long generateUUID() {
         long id = UUID.incrementAndGet();
         if (id >= getMaxUUID()) {
             synchronized (UUID) {

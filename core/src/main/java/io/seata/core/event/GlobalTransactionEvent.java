@@ -92,4 +92,9 @@ public class GlobalTransactionEvent implements Event {
         this.endTime = endTime;
         this.status = status;
     }
+
+    @Override
+    public String getKey() {
+        return status.toString();
+    }
 }

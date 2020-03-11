@@ -86,6 +86,7 @@ public class DataBaseSessionManager extends AbstractSessionManager
     public void addGlobalSession(GlobalSession session) throws TransactionException {
         if (StringUtils.isBlank(taskName)) {
             boolean ret = transactionStoreManager.writeSession(LogOperation.GLOBAL_ADD, session);
+            System.out.println("addGlobalSession: " + session.toString());
             if (!ret) {
                 throw new StoreException("addGlobalSession failed.");
             }
@@ -103,6 +104,7 @@ public class DataBaseSessionManager extends AbstractSessionManager
             return;
         }
         session.setStatus(status);
+        System.out.println("updateGlobalSessionStatus: " + session.toString());
         boolean ret = transactionStoreManager.writeSession(LogOperation.GLOBAL_UPDATE, session);
         if (!ret) {
             throw new StoreException("updateGlobalSessionStatus failed.");
@@ -129,6 +131,7 @@ public class DataBaseSessionManager extends AbstractSessionManager
         if (StringUtils.isNotBlank(taskName)) {
             return;
         }
+        System.out.println("addBranchSession: " + session.toString());
         boolean ret = transactionStoreManager.writeSession(LogOperation.BRANCH_ADD, session);
         if (!ret) {
             throw new StoreException("addBranchSession failed.");
@@ -140,6 +143,7 @@ public class DataBaseSessionManager extends AbstractSessionManager
         if (StringUtils.isNotBlank(taskName)) {
             return;
         }
+        System.out.println("updateBranchSessionStatus: " + session.toString());
         boolean ret = transactionStoreManager.writeSession(LogOperation.BRANCH_UPDATE, session);
         if (!ret) {
             throw new StoreException("updateBranchSessionStatus failed.");
@@ -151,6 +155,7 @@ public class DataBaseSessionManager extends AbstractSessionManager
         if (StringUtils.isNotBlank(taskName)) {
             return;
         }
+        System.out.println("removeBranchSession: " + session.toString());
         boolean ret = transactionStoreManager.writeSession(LogOperation.BRANCH_REMOVE, session);
         if (!ret) {
             throw new StoreException("removeBranchSession failed.");

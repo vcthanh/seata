@@ -348,6 +348,7 @@ public class DefaultCore implements Core {
 
     @Override
     public GlobalStatus globalReport(String xid, GlobalStatus globalStatus) throws TransactionException {
+
         GlobalSession globalSession = SessionHolder.findGlobalSession(xid);
         if (globalSession == null) {
             return globalStatus;
@@ -361,6 +362,8 @@ public class DefaultCore implements Core {
     public void doGlobalReport(GlobalSession globalSession, String xid, GlobalStatus globalStatus) throws TransactionException {
         if (globalSession.isSaga()) {
             getCore(BranchType.SAGA).doGlobalReport(globalSession, xid, globalStatus);
+            eventBus.post(new GlobalTransactionEvent(globalSession.getTransactionId(), GlobalTransactionEvent.ROLE_TC,
+                    globalSession.getTransactionName(), globalSession.getBeginTime(), System.currentTimeMillis(), globalSession.getStatus()));
         }
     }
 }

@@ -462,7 +462,7 @@ public class StateMachineDBTests extends AbstractServerTest {
     @Test
     public void simpleChoiceTestStateMachineAsyncConcurrently() throws Exception {
 
-        final CountDownLatch countDownLatch = new CountDownLatch(100);
+        final CountDownLatch countDownLatch = new CountDownLatch(10000);
         final List<Exception> exceptions = new ArrayList<>();
 
         final AsyncCallback asyncCallback = new AsyncCallback() {
@@ -481,11 +481,11 @@ public class StateMachineDBTests extends AbstractServerTest {
         };
 
         long start = System.currentTimeMillis();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    for (int j = 0; j < 10; j++) {
+                    for (int j = 0; j < 100; j++) {
                         Map<String, Object> paramMap = new HashMap<>();
                         paramMap.put("a", 1);
                         paramMap.put("barThrowException", "false");

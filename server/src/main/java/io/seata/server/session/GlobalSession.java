@@ -49,6 +49,25 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
 
     private static final int MAX_GLOBAL_SESSION_SIZE = StoreConfig.getMaxGlobalSessionSize();
 
+    @Override
+    public String toString() {
+        return "GlobalSession{" +
+                "xid='" + xid + '\'' +
+                ", transactionId=" + transactionId +
+                ", status=" + status +
+                ", applicationId='" + applicationId + '\'' +
+                ", transactionServiceGroup='" + transactionServiceGroup + '\'' +
+                ", transactionName='" + transactionName + '\'' +
+                ", timeout=" + timeout +
+                ", beginTime=" + beginTime +
+                ", applicationData='" + applicationData + '\'' +
+                ", active=" + active +
+                ", branchSessions=" + branchSessions +
+                ", globalSessionLock=" + globalSessionLock +
+                ", lifecycleListeners=" + lifecycleListeners +
+                '}';
+    }
+
     private static ThreadLocal<ByteBuffer> byteBufferThreadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(
         MAX_GLOBAL_SESSION_SIZE));
 

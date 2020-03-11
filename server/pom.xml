@@ -60,7 +60,6 @@
             <artifactId>seata-metrics-all</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <!-- for database -->
         <dependency>
             <groupId>com.alibaba</groupId>

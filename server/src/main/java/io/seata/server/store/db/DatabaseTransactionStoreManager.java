@@ -33,6 +33,9 @@ import io.seata.common.util.StringUtils;
 import io.seata.config.Configuration;
 import io.seata.config.ConfigurationFactory;
 import io.seata.core.constants.ConfigurationKeys;
+import io.seata.core.event.DatabaseEvent;
+import io.seata.core.event.EventBus;
+import io.seata.core.event.OperationEvent;
 import io.seata.core.model.BranchStatus;
 import io.seata.core.model.BranchType;
 import io.seata.core.model.GlobalStatus;
@@ -42,6 +45,7 @@ import io.seata.core.store.LogStore;
 import io.seata.core.store.StoreMode;
 import io.seata.core.store.db.DataSourceGenerator;
 import io.seata.server.UUIDGenerator;
+import io.seata.server.event.EventBusManager;
 import io.seata.server.session.BranchSession;
 import io.seata.server.session.GlobalSession;
 import io.seata.server.session.SessionCondition;
@@ -83,6 +87,8 @@ public class DatabaseTransactionStoreManager extends AbstractTransactionStoreMan
      */
     protected int logQueryLimit;
 
+    private EventBus eventBus = EventBusManager.get();
+
     /**
      * Instantiates a new Database transaction store manager.
      */
@@ -106,21 +112,32 @@ public class DatabaseTransactionStoreManager extends AbstractTransactionStoreMan
 
     @Override
     public boolean writeSession(LogOperation logOperation, SessionStorable session) {
+        boolean result;
+        long beginTime = System.currentTimeMillis();
+        OperationEvent operationEvent;
         if (LogOperation.GLOBAL_ADD.equals(logOperation)) {
-            return logStore.insertGlobalTransactionDO(convertGlobalTransactionDO(session));
+            operationEvent = OperationEvent.ADD_GLOBAL_SESSION;
+            result = logStore.insertGlobalTransactionDO(convertGlobalTransactionDO(session));
         } else if (LogOperation.GLOBAL_UPDATE.equals(logOperation)) {
-            return logStore.updateGlobalTransactionDO(convertGlobalTransactionDO(session));
+            operationEvent = OperationEvent.UPDATE_GLOBAL_SESSION;
+            result = logStore.updateGlobalTransactionDO(convertGlobalTransactionDO(session));
         } else if (LogOperation.GLOBAL_REMOVE.equals(logOperation)) {
-            return logStore.deleteGlobalTransactionDO(convertGlobalTransactionDO(session));
+            operationEvent = OperationEvent.DELETE_GLOBAL_SESSION;
+            result = logStore.deleteGlobalTransactionDO(convertGlobalTransactionDO(session));
         } else if (LogOperation.BRANCH_ADD.equals(logOperation)) {
-            return logStore.insertBranchTransactionDO(convertBranchTransactionDO(session));
+            operationEvent = OperationEvent.ADD_BRANCH_SESSION;
+            result = logStore.insertBranchTransactionDO(convertBranchTransactionDO(session));
         } else if (LogOperation.BRANCH_UPDATE.equals(logOperation)) {
-            return logStore.updateBranchTransactionDO(convertBranchTransactionDO(session));
+            operationEvent = OperationEvent.UPDATE_BRANCH_SESSION;
+            result = logStore.updateBranchTransactionDO(convertBranchTransactionDO(session));
         } else if (LogOperation.BRANCH_REMOVE.equals(logOperation)) {
-            return logStore.deleteBranchTransactionDO(convertBranchTransactionDO(session));
+            operationEvent = OperationEvent.DELETE_BRANCH_SESSION;
+            result = logStore.deleteBranchTransactionDO(convertBranchTransactionDO(session));
         } else {
             throw new StoreException("Unknown LogOperation:" + logOperation.name());
         }
+        eventBus.post(new DatabaseEvent(beginTime, System.currentTimeMillis(), operationEvent));
+        return result;
     }
 
     /**
@@ -188,6 +205,8 @@ public class DatabaseTransactionStoreManager extends AbstractTransactionStoreMan
         }
         //global transaction
         List<GlobalTransactionDO> globalTransactionDOs = logStore.queryGlobalTransactionDO(states, logQueryLimit);
+
+        globalTransactionDOs.forEach(globalTransactionDO -> System.out.println(globalTransactionDO));
         if (CollectionUtils.isEmpty(globalTransactionDOs)) {
             return null;
         }

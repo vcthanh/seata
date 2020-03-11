@@ -58,4 +58,34 @@ public class MeterIdConstants {
         .withTag(IdConstants.ROLE_KEY, IdConstants.ROLE_VALUE_TC)
         .withTag(IdConstants.METER_KEY, IdConstants.METER_VALUE_TIMER)
         .withTag(IdConstants.STATUS_KEY, IdConstants.STATUS_VALUE_ROLLBACKED);
+
+    public static final Id TIMER_ADD_GLOBAL_SESSION = new Id(IdConstants.SEATA_TRANSACTION)
+            .withTag(IdConstants.ROLE_KEY, IdConstants.ROLE_VALUE_TC)
+            .withTag(IdConstants.METER_KEY, IdConstants.METER_VALUE_TIMER)
+            .withTag(IdConstants.STATUS_KEY, IdConstants.ADD_GLOBAL_SESSION);
+
+    public static final Id TIMER_UPDATE_GLOBAL_SESSION = new Id(IdConstants.SEATA_TRANSACTION)
+            .withTag(IdConstants.ROLE_KEY, IdConstants.ROLE_VALUE_TC)
+            .withTag(IdConstants.METER_KEY, IdConstants.METER_VALUE_TIMER)
+            .withTag(IdConstants.STATUS_KEY, IdConstants.UPDATE_GLOBAL_SESSION);
+
+    public static final Id TIMER_DELETE_GLOBAL_SESSION = new Id(IdConstants.SEATA_TRANSACTION)
+            .withTag(IdConstants.ROLE_KEY, IdConstants.ROLE_VALUE_TC)
+            .withTag(IdConstants.METER_KEY, IdConstants.METER_VALUE_TIMER)
+            .withTag(IdConstants.STATUS_KEY, IdConstants.DELETE_GLOBAL_SESSION);
+
+    public static final Id TIMER_ADD_BRANCH_SESSION = new Id(IdConstants.SEATA_TRANSACTION)
+            .withTag(IdConstants.ROLE_KEY, IdConstants.ROLE_VALUE_TC)
+            .withTag(IdConstants.METER_KEY, IdConstants.METER_VALUE_TIMER)
+            .withTag(IdConstants.STATUS_KEY, IdConstants.ADD_BRANCH_SESSION);
+
+    public static final Id TIMER_UPDATE_BRANCH_SESSION = new Id(IdConstants.SEATA_TRANSACTION)
+            .withTag(IdConstants.ROLE_KEY, IdConstants.ROLE_VALUE_TC)
+            .withTag(IdConstants.METER_KEY, IdConstants.METER_VALUE_TIMER)
+            .withTag(IdConstants.STATUS_KEY, IdConstants.UPDATE_BRANCH_SESSION);
+
+    public static final Id TIMER_DELETE_BRANCH_SESSION = new Id(IdConstants.SEATA_TRANSACTION)
+            .withTag(IdConstants.ROLE_KEY, IdConstants.ROLE_VALUE_TC)
+            .withTag(IdConstants.METER_KEY, IdConstants.METER_VALUE_TIMER)
+            .withTag(IdConstants.STATUS_KEY, IdConstants.DELETE_BRANCH_SESSION);
 }

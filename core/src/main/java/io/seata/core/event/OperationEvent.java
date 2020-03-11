@@ -16,10 +16,31 @@
 package io.seata.core.event;
 
 /**
- * The base interface for seata event.
- *
- * @author zhengyangyong
+ * @author phuctt4
  */
-public interface Event {
-    String getKey();
+public enum OperationEvent {
+    /**
+     * ADD_GLOBAL_SESSION event type.
+     */
+    ADD_GLOBAL_SESSION,
+    /**
+     * UPDATE_GLOBAL_SESSION event type.
+     */
+    UPDATE_GLOBAL_SESSION,
+    /**
+     * DELETE_GLOBAL_SESSION event type.
+     */
+    DELETE_GLOBAL_SESSION,
+    /**
+     * ADD_BRANCH_SESSION event type.
+     */
+    ADD_BRANCH_SESSION,
+    /**
+     * UPDATE_BRANCH_SESSION event type.
+     */
+    UPDATE_BRANCH_SESSION,
+    /**
+     * DELETE_BRANCH_SESSION event type.
+     */
+    DELETE_BRANCH_SESSION
 }

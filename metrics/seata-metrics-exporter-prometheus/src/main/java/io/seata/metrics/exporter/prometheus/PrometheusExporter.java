@@ -16,10 +16,22 @@
 package io.seata.metrics.exporter.prometheus;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.sun.net.httpserver.HttpServer;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
+import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
+import io.micrometer.prometheus.PrometheusConfig;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.prometheus.client.Collector;
 import io.prometheus.client.Collector.MetricFamilySamples.Sample;
 import io.prometheus.client.exporter.HTTPServer;
@@ -40,20 +52,51 @@ import static io.seata.core.constants.ConfigurationKeys.METRICS_EXPORTER_PROMETH
 @LoadLevel(name = "Prometheus", order = 1)
 public class PrometheusExporter extends Collector implements Collector.Describable, Exporter {
 
-    private final HTTPServer server;
+//    private final HTTPServer server;
 
     private Registry registry;
+    private PrometheusMeterRegistry registryPrometheus;
 
     public PrometheusExporter() throws IOException {
+//        this.server = new HTTPServer(port, true);
+//        this.register();
+    }
+
+    public void init() {
         int port = ConfigurationFactory.getInstance().getInt(
-            ConfigurationKeys.METRICS_PREFIX + METRICS_EXPORTER_PROMETHEUS_PORT, 9898);
-        this.server = new HTTPServer(port, true);
-        this.register();
+                ConfigurationKeys.METRICS_PREFIX + METRICS_EXPORTER_PROMETHEUS_PORT, 9898);
+        List<Tag> tags = Arrays.asList(Tag.of("application", "seata"));
+        new ClassLoaderMetrics(tags).bindTo(registryPrometheus);
+        new JvmMemoryMetrics(tags).bindTo(registryPrometheus);
+        new JvmGcMetrics(tags).bindTo(registryPrometheus);
+        new ProcessorMetrics(tags).bindTo(registryPrometheus);
+        new JvmThreadMetrics(tags).bindTo(registryPrometheus);
+        registryPrometheus.getPrometheusRegistry().register(this);
+//        this.server = new HTTPServer(port, registry.getPrometheusRegistry(), true);
+        try {
+            HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+            server.createContext("/metrics", httpExchange -> {
+                String response = registryPrometheus.scrape();
+                httpExchange.sendResponseHeaders(200, response.getBytes().length);
+                try (OutputStream os = httpExchange.getResponseBody()) {
+                    os.write(response.getBytes());
+                }
+            });
+
+            new Thread(server::start).start();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void setRegistry(Registry registry) {
         this.registry = registry;
+    }
+
+    @Override
+    public void setRegistryPrometheus(PrometheusMeterRegistry registry) {
+        this.registryPrometheus = registry;
     }
 
     @Override
@@ -90,7 +133,7 @@ public class PrometheusExporter extends Collector implements Collector.Describab
 
     @Override
     public void close() {
-        server.stop();
+//        server.stop();
     }
 
 }

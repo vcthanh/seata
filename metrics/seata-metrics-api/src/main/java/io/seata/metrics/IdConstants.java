@@ -62,4 +62,13 @@ public class IdConstants {
     public static final String STATUS_VALUE_COMMITTED = "committed";
 
     public static final String STATUS_VALUE_ROLLBACKED = "rollbacked";
+
+    public static final String ADD_GLOBAL_SESSION = "add_global_session";
+    public static final String UPDATE_GLOBAL_SESSION = "update_global_session";
+    public static final String DELETE_GLOBAL_SESSION = "delete_global_session";
+    public static final String ADD_BRANCH_SESSION = "add_branch_session";
+    public static final String UPDATE_BRANCH_SESSION = "update_branch_session";
+    public static final String DELETE_BRANCH_SESSION = "delete_branch_session";
+
+    public static final String VALUE_DURATION = "duration";
 }
