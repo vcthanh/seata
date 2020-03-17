@@ -664,6 +664,8 @@
                                     <include>io.seata:seata-compressor-7z</include>
                                     <include>io.seata:seata-compressor-bzip2</include>
                                     <include>io.seata:seata-compressor-zip</include>
+                                    <include>io.seata:seata-metrics-api</include>
+                                    <include>io.seata:seata-metrics-core</include>
                                 </includes>
                             </artifactSet>
                             <transformers>
@@ -790,16 +792,30 @@
                     </plugin>
                 </plugins>
             </build>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>oss_seata</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-                </snapshotRepository>
-                <repository>
-                    <id>oss_seata</id>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
+<!--            <distributionManagement>-->
+<!--                <snapshotRepository>-->
+<!--                    <id>oss_seata</id>-->
+<!--                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
+<!--                </snapshotRepository>-->
+<!--                <repository>-->
+<!--                    <id>oss_seata</id>-->
+<!--                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
+<!--                </repository>-->
+<!--            </distributionManagement>-->
         </profile>
     </profiles>
+
+    <distributionManagement>
+        <repository>
+            <id>central</id>
+            <name>GP_ZaloPay-Storage-638.3-releases</name>
+            <url>http://artifactory.zalopay.com.vn/artifactory/vng-zalopay-backend</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>GP_ZaloPay-Storage-638.3-snapshots</name>
+            <url>http://artifactory.zalopay.com.vn/artifactory/vng-zalopay-backend</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>

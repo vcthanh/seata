@@ -15,8 +15,10 @@
  */
 package io.seata.rm;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.seata.common.exception.NotSupportYetException;
 import io.seata.core.exception.RmTransactionException;
 import io.seata.core.exception.TransactionException;
@@ -32,6 +34,7 @@ import io.seata.core.protocol.transaction.BranchReportRequest;
 import io.seata.core.protocol.transaction.BranchReportResponse;
 import io.seata.core.rpc.netty.RmRpcClient;
 
+import io.seata.metrics.registry.PrometheusRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +46,10 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractResourceManager implements ResourceManager {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractResourceManager.class);
+    private PrometheusMeterRegistry registry = PrometheusRegistry.getInstance();
+
+    private static final String METRICS_NAME = "seata_rm_client";
+    private static final String APPLICATION_NAME = "seata";
 
     /**
      * registry branch record
@@ -64,14 +71,35 @@ public abstract class AbstractResourceManager implements ResourceManager {
             request.setBranchType(branchType);
             request.setApplicationData(applicationData);
 
+            long begin = System.currentTimeMillis();
             BranchRegisterResponse response = (BranchRegisterResponse) RmRpcClient.getInstance().sendMsgWithResponse(request);
+            registry.timer(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "timer",
+                    "operation", "register_branch")
+                    .record(System.currentTimeMillis() - begin, TimeUnit.MILLISECONDS);
+            registry.counter(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "counter",
+                    "operation", "register_branch",
+                    "status", "succeeded").increment();
             if (response.getResultCode() == ResultCode.Failed) {
                 throw new RmTransactionException(response.getTransactionExceptionCode(), String.format("Response[ %s ]", response.getMsg()));
             }
             return response.getBranchId();
         } catch (TimeoutException toe) {
+            registry.counter(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "counter",
+                    "operation", "register_branch",
+                    "status", "timeout").increment();
             throw new RmTransactionException(TransactionExceptionCode.IO, "RPC Timeout", toe);
         } catch (RuntimeException rex) {
+            registry.counter(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "counter",
+                    "operation", "register_branch",
+                    "status", "failed").increment();
             throw new RmTransactionException(TransactionExceptionCode.BranchRegisterFailed, "Runtime", rex);
         }
     }
@@ -94,13 +122,34 @@ public abstract class AbstractResourceManager implements ResourceManager {
             request.setStatus(status);
             request.setApplicationData(applicationData);
 
+            long begin = System.currentTimeMillis();
             BranchReportResponse response = (BranchReportResponse) RmRpcClient.getInstance().sendMsgWithResponse(request);
+            registry.timer(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "timer",
+                    "operation", "report_branch")
+                    .record(System.currentTimeMillis() - begin, TimeUnit.MILLISECONDS);
+            registry.counter(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "counter",
+                    "operation", "report_branch",
+                    "status", "succeeded").increment();
             if (response.getResultCode() == ResultCode.Failed) {
                 throw new RmTransactionException(response.getTransactionExceptionCode(), String.format("Response[ %s ]", response.getMsg()));
             }
         } catch (TimeoutException toe) {
+            registry.counter(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "counter",
+                    "operation", "report_branch",
+                    "status", "timeout").increment();
             throw new RmTransactionException(TransactionExceptionCode.IO, "RPC Timeout", toe);
         } catch (RuntimeException rex) {
+            registry.counter(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "counter",
+                    "operation", "report_branch",
+                    "status", "failed").increment();
             throw new RmTransactionException(TransactionExceptionCode.BranchReportFailed, "Runtime", rex);
         }
     }
