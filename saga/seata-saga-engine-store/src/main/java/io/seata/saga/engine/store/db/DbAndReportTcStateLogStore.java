@@ -23,12 +23,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.seata.common.exception.FrameworkErrorCode;
 import io.seata.core.context.RootContext;
 import io.seata.core.exception.TransactionException;
 import io.seata.core.model.BranchStatus;
 import io.seata.core.model.GlobalStatus;
+import io.seata.metrics.registry.PrometheusRegistry;
 import io.seata.saga.engine.StateMachineConfig;
 import io.seata.saga.engine.config.DbStateMachineConfig;
 import io.seata.saga.engine.exception.EngineExecutionException;
@@ -80,6 +83,11 @@ public class DbAndReportTcStateLogStore extends AbstractStore implements StateLo
     private String            defaultTenantId;
     private SeqGenerator      seqGenerator;
 
+    private static final String METRICS_NAME = "seata_client_database";
+    private static final String APPLICATION_NAME = "seata";
+
+    private PrometheusMeterRegistry registry = PrometheusRegistry.getInstance();
+
     @Override
     public void recordStateMachineStarted(StateMachineInstance machineInstance, ProcessContext context) {
 
@@ -102,8 +110,15 @@ public class DbAndReportTcStateLogStore extends AbstractStore implements StateLo
 
             // save to db
             machineInstance.setSerializedStartParams(paramsSerializer.serialize(machineInstance.getStartParams()));
+
+            long begin = System.currentTimeMillis();
             executeUpdate(stateLogStoreSqls.getRecordStateMachineStartedSql(dbType),
                     STATE_MACHINE_INSTANCE_TO_STATEMENT_FOR_INSERT, machineInstance);
+            registry.timer(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "timer",
+                    "operation", "state_machine_started")
+                    .record(System.currentTimeMillis() - begin, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -156,8 +171,15 @@ public class DbAndReportTcStateLogStore extends AbstractStore implements StateLo
 
             machineInstance.setSerializedEndParams(paramsSerializer.serialize(machineInstance.getEndParams()));
             machineInstance.setSerializedException(exceptionSerializer.serialize(machineInstance.getException()));
+
+            long begin = System.currentTimeMillis();
             int effect = executeUpdate(stateLogStoreSqls.getRecordStateMachineFinishedSql(dbType),
                     STATE_MACHINE_INSTANCE_TO_STATEMENT_FOR_UPDATE, machineInstance);
+            registry.timer(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "timer",
+                    "operation", "state_machine_finished")
+                    .record(System.currentTimeMillis() - begin, TimeUnit.MILLISECONDS);
             if (effect < 1) {
                 LOGGER.warn("StateMachineInstance[{}] is recovery by server, skip recordStateMachineFinished.", machineInstance.getId());
             } else {
@@ -229,8 +251,15 @@ public class DbAndReportTcStateLogStore extends AbstractStore implements StateLo
         if (machineInstance != null) {
             //save to db
             Date gmtUpdated = new Date();
+
+            long begin = System.currentTimeMillis();
             int effect = executeUpdate(stateLogStoreSqls.getUpdateStateMachineRunningStatusSql(dbType), machineInstance.isRunning(), new Timestamp(gmtUpdated.getTime()),
                     machineInstance.getId(), new Timestamp(machineInstance.getGmtUpdated().getTime()));
+            registry.timer(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "timer",
+                    "operation", "state_machine_restarted")
+                    .record(System.currentTimeMillis() - begin, TimeUnit.MILLISECONDS);
             if (effect < 1) {
                 throw new EngineExecutionException(
                         "StateMachineInstance [id:" + machineInstance.getId() + "] is recovered by an other execution, restart denied", FrameworkErrorCode.OperationDenied);
@@ -264,8 +293,14 @@ public class DbAndReportTcStateLogStore extends AbstractStore implements StateLo
             }
 
             stateInstance.setSerializedInputParams(paramsSerializer.serialize(stateInstance.getInputParams()));
+            long begin = System.currentTimeMillis();
             executeUpdate(stateLogStoreSqls.getRecordStateStartedSql(dbType), STATE_INSTANCE_TO_STATEMENT_FOR_INSERT,
                     stateInstance);
+            registry.timer(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "timer",
+                    "operation", "state_started")
+                    .record(System.currentTimeMillis() - begin, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -388,8 +423,14 @@ public class DbAndReportTcStateLogStore extends AbstractStore implements StateLo
 
             stateInstance.setSerializedOutputParams(paramsSerializer.serialize(stateInstance.getOutputParams()));
             stateInstance.setSerializedException(exceptionSerializer.serialize(stateInstance.getException()));
+            long begin = System.currentTimeMillis();
             executeUpdate(stateLogStoreSqls.getRecordStateFinishedSql(dbType), STATE_INSTANCE_TO_STATEMENT_FOR_UPDATE,
                     stateInstance);
+            registry.timer(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "timer",
+                    "operation", "state_finished")
+                    .record(System.currentTimeMillis() - begin, TimeUnit.MILLISECONDS);
 
             //A switch to skip branch report on branch success, in order to optimize performance
             StateMachineConfig stateMachineConfig = (StateMachineConfig) context.getVariable(

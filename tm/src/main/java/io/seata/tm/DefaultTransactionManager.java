@@ -15,8 +15,10 @@
  */
 package io.seata.tm;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.seata.core.exception.TmTransactionException;
 import io.seata.core.exception.TransactionException;
 import io.seata.core.exception.TransactionExceptionCode;
@@ -36,6 +38,7 @@ import io.seata.core.protocol.transaction.GlobalRollbackResponse;
 import io.seata.core.protocol.transaction.GlobalStatusRequest;
 import io.seata.core.protocol.transaction.GlobalStatusResponse;
 import io.seata.core.rpc.netty.TmRpcClient;
+import io.seata.metrics.registry.PrometheusRegistry;
 
 /**
  * The type Default transaction manager.
@@ -44,14 +47,23 @@ import io.seata.core.rpc.netty.TmRpcClient;
  */
 public class DefaultTransactionManager implements TransactionManager {
 
+    private PrometheusMeterRegistry registry = PrometheusRegistry.getInstance();
+    private static final String METRICS_NAME = "seata_tm_client";
+    private static final String APPLICATION_NAME = "seata";
+
     @Override
     public String begin(String applicationId, String transactionServiceGroup, String name, int timeout)
         throws TransactionException {
         GlobalBeginRequest request = new GlobalBeginRequest();
         request.setTransactionName(name);
         request.setTimeout(timeout);
-        GlobalBeginResponse response = (GlobalBeginResponse)syncCall(request);
+        GlobalBeginResponse response = (GlobalBeginResponse)syncCall(request, "begin_transaction");
         if (response.getResultCode() == ResultCode.Failed) {
+            registry.counter(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "counter",
+                    "operation", "begin_transaction",
+                    "status", "failed").increment();
             throw new TmTransactionException(TransactionExceptionCode.BeginFailed, response.getMsg());
         }
         return response.getXid();
@@ -61,7 +73,7 @@ public class DefaultTransactionManager implements TransactionManager {
     public GlobalStatus commit(String xid) throws TransactionException {
         GlobalCommitRequest globalCommit = new GlobalCommitRequest();
         globalCommit.setXid(xid);
-        GlobalCommitResponse response = (GlobalCommitResponse)syncCall(globalCommit);
+        GlobalCommitResponse response = (GlobalCommitResponse)syncCall(globalCommit, "commit_transaction");
         return response.getGlobalStatus();
     }
 
@@ -69,7 +81,7 @@ public class DefaultTransactionManager implements TransactionManager {
     public GlobalStatus rollback(String xid) throws TransactionException {
         GlobalRollbackRequest globalRollback = new GlobalRollbackRequest();
         globalRollback.setXid(xid);
-        GlobalRollbackResponse response = (GlobalRollbackResponse)syncCall(globalRollback);
+        GlobalRollbackResponse response = (GlobalRollbackResponse)syncCall(globalRollback, "rollback_transaction");
         return response.getGlobalStatus();
     }
 
@@ -77,7 +89,7 @@ public class DefaultTransactionManager implements TransactionManager {
     public GlobalStatus getStatus(String xid) throws TransactionException {
         GlobalStatusRequest queryGlobalStatus = new GlobalStatusRequest();
         queryGlobalStatus.setXid(xid);
-        GlobalStatusResponse response = (GlobalStatusResponse)syncCall(queryGlobalStatus);
+        GlobalStatusResponse response = (GlobalStatusResponse)syncCall(queryGlobalStatus, "query_status_transaction");
         return response.getGlobalStatus();
     }
 
@@ -86,14 +98,31 @@ public class DefaultTransactionManager implements TransactionManager {
         GlobalReportRequest globalReport = new GlobalReportRequest();
         globalReport.setXid(xid);
         globalReport.setGlobalStatus(globalStatus);
-        GlobalReportResponse response = (GlobalReportResponse) syncCall(globalReport);
+        GlobalReportResponse response = (GlobalReportResponse) syncCall(globalReport, "report_transaction");
         return response.getGlobalStatus();
     }
 
-    private AbstractTransactionResponse syncCall(AbstractTransactionRequest request) throws TransactionException {
+    private AbstractTransactionResponse syncCall(AbstractTransactionRequest request, String operation) throws TransactionException {
         try {
-            return (AbstractTransactionResponse)TmRpcClient.getInstance().sendMsgWithResponse(request);
+            long begin = System.currentTimeMillis();
+            AbstractTransactionResponse response = (AbstractTransactionResponse)TmRpcClient.getInstance().sendMsgWithResponse(request);
+            registry.timer(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "timer",
+                    "operation", operation)
+                    .record(System.currentTimeMillis() - begin, TimeUnit.MILLISECONDS);
+            registry.counter(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "counter",
+                    "operation", operation,
+                    "status", "succeeded").increment();
+            return response;
         } catch (TimeoutException toe) {
+            registry.counter(METRICS_NAME,
+                    "application", APPLICATION_NAME,
+                    "type", "counter",
+                    "operation", operation,
+                    "status", "timeout").increment();
             throw new TmTransactionException(TransactionExceptionCode.IO, "RPC timeout", toe);
         }
     }

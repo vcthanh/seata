@@ -30,6 +30,7 @@ import io.seata.core.constants.ConfigurationKeys;
 import io.seata.metrics.exporter.Exporter;
 import io.seata.metrics.exporter.ExporterFactory;
 import io.seata.metrics.exporter.prometheus.PrometheusExporter;
+import io.seata.metrics.registry.PrometheusRegistry;
 import io.seata.metrics.registry.Registry;
 import io.seata.metrics.registry.RegistryFactory;
 import io.seata.server.event.EventBusManager;
@@ -62,25 +63,7 @@ public class MetricsManager {
         boolean enabled = ConfigurationFactory.getInstance().getBoolean(
             ConfigurationKeys.METRICS_PREFIX + ConfigurationKeys.METRICS_ENABLED, false);
         if (enabled) {
-            registryPrometheus = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
-            registryPrometheus.config()
-                    .meterFilter(
-                            new MeterFilter() {
-                                @Override
-                                public DistributionStatisticConfig configure(
-                                        Meter.Id id, @NonNull DistributionStatisticConfig config) {
-
-                                    return DistributionStatisticConfig.builder()
-                                            .percentilesHistogram(false)
-                                            .percentiles(0.99)
-                                            .expiry(Duration.ofMinutes(1))
-                                            .bufferLength(3)
-                                            .sla(1, 2, 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 1000)
-                                            .build()
-                                            .merge(config);
-
-                                }
-                            });
+            registryPrometheus = PrometheusRegistry.getInstance();
 
                 List<Exporter> exporters = ExporterFactory.getInstanceList();
                 //only at least one metrics exporter implement had imported in pom then need register MetricsSubscriber
