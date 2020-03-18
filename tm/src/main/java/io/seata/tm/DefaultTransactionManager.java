@@ -38,7 +38,7 @@ import io.seata.core.protocol.transaction.GlobalRollbackResponse;
 import io.seata.core.protocol.transaction.GlobalStatusRequest;
 import io.seata.core.protocol.transaction.GlobalStatusResponse;
 import io.seata.core.rpc.netty.TmRpcClient;
-import io.seata.metrics.registry.PrometheusRegistry;
+import zalopay.metrics.PrometheusRegistry;
 
 /**
  * The type Default transaction manager.

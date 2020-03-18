@@ -49,6 +49,7 @@
         <module>compressor</module>
         <module>saga</module>
         <module>sqlparser</module>
+        <module>zalopay</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -88,7 +89,7 @@
 
     <properties>
         <!-- seata version -->
-        <revision>1.2.0-zalopay</revision>
+        <revision>1.2.0-SNAPSHOT</revision>
 
         <!-- Compiler settings properties -->
         <maven.compiler.source>1.8</maven.compiler.source>

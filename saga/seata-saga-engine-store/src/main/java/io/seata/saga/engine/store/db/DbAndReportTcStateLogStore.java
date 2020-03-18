@@ -31,7 +31,6 @@ import io.seata.core.context.RootContext;
 import io.seata.core.exception.TransactionException;
 import io.seata.core.model.BranchStatus;
 import io.seata.core.model.GlobalStatus;
-import io.seata.metrics.registry.PrometheusRegistry;
 import io.seata.saga.engine.StateMachineConfig;
 import io.seata.saga.engine.config.DbStateMachineConfig;
 import io.seata.saga.engine.exception.EngineExecutionException;
@@ -55,6 +54,7 @@ import io.seata.tm.api.transaction.TransactionInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+import zalopay.metrics.PrometheusRegistry;
 
 /**
  * State machine logs and definitions persist to database and report status to TC (Transaction Coordinator)

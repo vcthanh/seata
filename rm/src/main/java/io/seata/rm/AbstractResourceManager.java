@@ -34,9 +34,9 @@ import io.seata.core.protocol.transaction.BranchReportRequest;
 import io.seata.core.protocol.transaction.BranchReportResponse;
 import io.seata.core.rpc.netty.RmRpcClient;
 
-import io.seata.metrics.registry.PrometheusRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import zalopay.metrics.PrometheusRegistry;
 
 /**
  * abstract ResourceManager

@@ -105,6 +105,12 @@
             <version>3.4.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-zalopay</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
 
     </dependencies>
 

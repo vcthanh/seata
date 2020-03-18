@@ -279,6 +279,11 @@
             <artifactId>seata-compressor-zip</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-zalopay</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- saga -->
         <dependency>

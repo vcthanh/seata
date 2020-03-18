@@ -21,13 +21,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import com.google.common.eventbus.Subscribe;
-import io.seata.core.event.DatabaseEvent;
 import io.seata.core.event.Event;
 import io.seata.core.event.GlobalTransactionEvent;
-import io.seata.core.event.OperationEvent;
 import io.seata.core.model.GlobalStatus;
 import io.seata.metrics.registry.Registry;
-import io.seata.server.store.TransactionStoreManager;
 
 /**
  * Event subscriber for metrics

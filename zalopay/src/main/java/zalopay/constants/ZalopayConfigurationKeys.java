@@ -13,18 +13,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package io.seata.metrics.exporter;
-
-import java.io.Closeable;
-
-import io.micrometer.prometheus.PrometheusMeterRegistry;
-import io.seata.metrics.registry.Registry;
+package zalopay.constants;
 
 /**
- * Exporter interface for metrics
- *
- * @author zhengyangyong
+ * @author phuctt4
  */
-public interface Exporter extends Closeable {
-    void setRegistry(Registry registry);
+public class ZalopayConfigurationKeys {
+    public static final String ZALOPAY_PREFIX = "zalopay.";
+
+    public static final String METRICS_PREFIX = ZALOPAY_PREFIX + "metrics.";
+
+    public static final String METRICS_ENABLED = "enabled";
+
+    public static final String METRICS_PORT = "port";
 }

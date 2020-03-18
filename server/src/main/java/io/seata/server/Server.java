@@ -26,6 +26,7 @@ import io.seata.server.metrics.MetricsManager;
 import io.seata.server.session.SessionHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.seata.server.metrics.CustomMetricsManager;
 
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -64,6 +65,8 @@ public class Server {
 
         //initialize the metrics
         MetricsManager.get().init();
+
+        CustomMetricsManager.get().init();
 
         System.setProperty(ConfigurationKeys.STORE_MODE, parameterParser.getStoreMode());
 

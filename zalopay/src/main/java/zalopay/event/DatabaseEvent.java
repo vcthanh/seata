@@ -13,7 +13,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package io.seata.core.event;
+package zalopay.event;
+
+import io.seata.core.event.Event;
 
 /**
  * @author phuctt4

@@ -15,22 +15,12 @@
  */
 package io.seata.server.metrics;
 
-import java.time.Duration;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.config.MeterFilter;
-import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
-import io.micrometer.prometheus.PrometheusConfig;
-import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.seata.config.ConfigurationFactory;
 import io.seata.core.constants.ConfigurationKeys;
 import io.seata.metrics.exporter.Exporter;
 import io.seata.metrics.exporter.ExporterFactory;
-import io.seata.metrics.exporter.prometheus.PrometheusExporter;
-import io.seata.metrics.registry.PrometheusRegistry;
 import io.seata.metrics.registry.Registry;
 import io.seata.metrics.registry.RegistryFactory;
 import io.seata.server.event.EventBusManager;
@@ -50,34 +40,24 @@ public class MetricsManager {
     }
 
     private Registry registry;
-    private PrometheusMeterRegistry registryPrometheus;
 
     public Registry getRegistry() {
         return registry;
     }
-    public PrometheusMeterRegistry getRegistryPrometheus() {
-        return registryPrometheus;
-    }
 
     public void init() {
         boolean enabled = ConfigurationFactory.getInstance().getBoolean(
-            ConfigurationKeys.METRICS_PREFIX + ConfigurationKeys.METRICS_ENABLED, false);
+                ConfigurationKeys.METRICS_PREFIX + ConfigurationKeys.METRICS_ENABLED, false);
         if (enabled) {
-            registryPrometheus = PrometheusRegistry.getInstance();
-
+            registry = RegistryFactory.getInstance();
+            if (registry != null) {
                 List<Exporter> exporters = ExporterFactory.getInstanceList();
                 //only at least one metrics exporter implement had imported in pom then need register MetricsSubscriber
                 if (exporters.size() != 0) {
-                    exporters.forEach(exporter -> {
-                        exporter.setRegistryPrometheus(registryPrometheus);
-                        if(exporter instanceof PrometheusExporter) {
-                            ((PrometheusExporter) exporter).init();
-                        }
-                    });
-                    EventBusManager.get().register(new CustomMetricsSubscriber(registryPrometheus));
+                    exporters.forEach(exporter -> exporter.setRegistry(registry));
+                    EventBusManager.get().register(new MetricsSubscriber(registry));
                 }
-
-
+            }
         }
     }
 }

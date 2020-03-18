@@ -17,12 +17,11 @@ package io.seata.server.metrics;
 
 import com.google.common.eventbus.Subscribe;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
-import io.seata.core.event.DatabaseEvent;
 import io.seata.core.event.Event;
 import io.seata.core.event.GlobalTransactionEvent;
-import io.seata.core.event.OperationEvent;
 import io.seata.core.model.GlobalStatus;
-import io.seata.metrics.registry.Registry;
+import zalopay.event.DatabaseEvent;
+import zalopay.event.OperationEvent;
 
 import java.util.HashMap;
 import java.util.Map;
