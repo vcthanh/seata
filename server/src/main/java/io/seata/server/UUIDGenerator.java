@@ -25,6 +25,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 
 import io.seata.common.exception.ShouldNeverHappenException;
+import io.seata.config.ConfigurationFactory;
+import zalopay.utils.SequenceGenerator;
 
 /**
  * The type Uuid generator.
@@ -37,13 +39,15 @@ public class UUIDGenerator {
     private static int serverNodeId = 1;
     private static final long UUID_INTERNAL = 2000000000;
     private static long initUUID = 0;
+    private static boolean snowflake = false;
+    private static SequenceGenerator sequenceGenerator;
 
     /**
      * Generate uuid long.
      *
      * @return the long
      */
-    public synchronized static long generateUUID() {
+    public synchronized static long generateUUIDOld() {
         long id = UUID.incrementAndGet();
         if (id >= getMaxUUID()) {
             synchronized (UUID) {
@@ -54,6 +58,14 @@ public class UUIDGenerator {
             }
         }
         return id;
+    }
+
+    public static long generateUUID() {
+        if(snowflake) {
+            return sequenceGenerator.nextId();
+        } else {
+            return generateUUIDOld();
+        }
     }
 
     /**
@@ -100,7 +112,11 @@ public class UUIDGenerator {
      *
      * @param serverNodeId the server node id
      */
-    public static void init(int serverNodeId) {
+    public static void init(int serverNodeId, boolean modeSnowflake) {
+        snowflake = modeSnowflake;
+        if(snowflake) {
+            sequenceGenerator = new SequenceGenerator(serverNodeId);
+        }
         try {
             UUIDGenerator.serverNodeId = serverNodeId;
             UUID.set(UUID_INTERNAL * serverNodeId);

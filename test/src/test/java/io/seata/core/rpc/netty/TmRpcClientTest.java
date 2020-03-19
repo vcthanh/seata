@@ -55,7 +55,7 @@ public class TmRpcClientTest {
             public void run() {
                 RpcServer rpcServer = new RpcServer(workingThreads);
                 rpcServer.setHandler(new DefaultCoordinator(rpcServer));
-                UUIDGenerator.init(1);
+                UUIDGenerator.init(1, false);
                 rpcServer.init();
             }
         });
@@ -90,7 +90,7 @@ public class TmRpcClientTest {
             public void run() {
                 RpcServer rpcServer = new RpcServer(workingThreads);
                 rpcServer.setHandler(new DefaultCoordinator(rpcServer));
-                UUIDGenerator.init(1);
+                UUIDGenerator.init(1, false);
                 rpcServer.init();
             }
         });
@@ -116,7 +116,7 @@ public class TmRpcClientTest {
             public void run() {
                 RpcServer rpcServer = new RpcServer(workingThreads);
                 rpcServer.setHandler(new DefaultCoordinator(rpcServer));
-                UUIDGenerator.init(1);
+                UUIDGenerator.init(1, false);
                 rpcServer.init();
             }
         });

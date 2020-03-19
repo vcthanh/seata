@@ -18,6 +18,7 @@ package io.seata.server;
 import io.seata.common.XID;
 import io.seata.common.thread.NamedThreadFactory;
 import io.seata.common.util.NetUtil;
+import io.seata.config.ConfigurationFactory;
 import io.seata.core.constants.ConfigurationKeys;
 import io.seata.core.rpc.netty.RpcServer;
 import io.seata.core.rpc.netty.ShutdownHook;
@@ -27,6 +28,7 @@ import io.seata.server.session.SessionHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.seata.server.metrics.CustomMetricsManager;
+import zalopay.constants.ZalopayConfigurationKeys;
 
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -73,7 +75,10 @@ public class Server {
         RpcServer rpcServer = new RpcServer(WORKING_THREADS);
         //server port
         rpcServer.setListenPort(parameterParser.getPort());
-        UUIDGenerator.init(parameterParser.getServerNode());
+
+        boolean snowflake = ConfigurationFactory.getInstance().getBoolean(ZalopayConfigurationKeys.SNOWFLAKE);
+
+        UUIDGenerator.init(parameterParser.getServerNode(), snowflake);
         //log store mode : file, db
         SessionHolder.init(parameterParser.getStoreMode());
 

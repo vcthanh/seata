@@ -26,4 +26,6 @@ public class ZalopayConfigurationKeys {
     public static final String METRICS_ENABLED = "enabled";
 
     public static final String METRICS_PORT = "port";
+
+    public static final String SNOWFLAKE = ZALOPAY_PREFIX + "snowflake";
 }

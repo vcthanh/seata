@@ -43,7 +43,7 @@ public class ServerTest {
 
         RpcServer rpcServer = new RpcServer(workingThreads);
         rpcServer.setHandler(new DefaultCoordinator(rpcServer));
-        UUIDGenerator.init(1);
+        UUIDGenerator.init(1, false);
         XID.setIpAddress(NetUtil.getLocalIp());
         XID.setPort(rpcServer.getListenPort());
         rpcServer.init();
