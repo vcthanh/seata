@@ -206,7 +206,6 @@ public class DatabaseTransactionStoreManager extends AbstractTransactionStoreMan
         //global transaction
         List<GlobalTransactionDO> globalTransactionDOs = logStore.queryGlobalTransactionDO(states, logQueryLimit);
 
-        globalTransactionDOs.forEach(globalTransactionDO -> System.out.println(globalTransactionDO));
         if (CollectionUtils.isEmpty(globalTransactionDOs)) {
             return null;
         }
