@@ -225,6 +225,7 @@ public class LogStoreDataBaseDAO implements LogStore, Initialize {
             ps.setInt(7, globalTransactionDO.getTimeout());
             ps.setLong(8, globalTransactionDO.getBeginTime());
             ps.setString(9, globalTransactionDO.getApplicationData());
+            ps.setInt(10, globalTransactionDO.getMaxRetryRollbackCount());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new StoreException(e);
@@ -243,7 +244,8 @@ public class LogStoreDataBaseDAO implements LogStore, Initialize {
             conn.setAutoCommit(true);
             ps = conn.prepareStatement(sql);
             ps.setInt(1, globalTransactionDO.getStatus());
-            ps.setString(2, globalTransactionDO.getXid());
+            ps.setInt(2, globalTransactionDO.getMaxRetryRollbackCount());
+            ps.setString(3, globalTransactionDO.getXid());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new StoreException(e);

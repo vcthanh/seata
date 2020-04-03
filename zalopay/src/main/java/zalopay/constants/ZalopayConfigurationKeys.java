@@ -28,4 +28,6 @@ public class ZalopayConfigurationKeys {
     public static final String METRICS_PORT = "port";
 
     public static final String SNOWFLAKE = ZALOPAY_PREFIX + "snowflake";
+
+    public static final String MAX_RETRY_ROLLBACK_COUNT = ZALOPAY_PREFIX + "maxRetryRollbackCount";
 }

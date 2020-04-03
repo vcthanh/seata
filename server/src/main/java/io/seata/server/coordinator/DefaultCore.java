@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import io.seata.common.exception.NotSupportYetException;
 import io.seata.common.loader.EnhancedServiceLoader;
 import io.seata.common.util.CollectionUtils;
+import io.seata.config.ConfigurationFactory;
 import io.seata.core.event.EventBus;
 import io.seata.core.event.GlobalTransactionEvent;
 import io.seata.core.exception.TransactionException;
@@ -36,6 +37,7 @@ import io.seata.server.session.SessionHelper;
 import io.seata.server.session.SessionHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import zalopay.constants.ZalopayConfigurationKeys;
 
 /**
  * The type Default core.
@@ -47,6 +49,8 @@ public class DefaultCore implements Core {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCore.class);
 
     private EventBus eventBus = EventBusManager.get();
+
+    private final int MAX_RETRY_ROLLBACK_COUNT = ConfigurationFactory.getInstance().getInt(ZalopayConfigurationKeys.MAX_RETRY_ROLLBACK_COUNT, 5);
 
     private static Map<BranchType, AbstractCore> coreMap = new ConcurrentHashMap<>();
 
@@ -121,8 +125,10 @@ public class DefaultCore implements Core {
     @Override
     public String begin(String applicationId, String transactionServiceGroup, String name, int timeout)
             throws TransactionException {
+//        GlobalSession session = GlobalSession.createGlobalSession(applicationId, transactionServiceGroup, name,
+//                timeout);
         GlobalSession session = GlobalSession.createGlobalSession(applicationId, transactionServiceGroup, name,
-                timeout);
+                timeout, MAX_RETRY_ROLLBACK_COUNT);
         session.addSessionLifecycleListener(SessionHolder.getRootSessionManager());
 
         session.begin();

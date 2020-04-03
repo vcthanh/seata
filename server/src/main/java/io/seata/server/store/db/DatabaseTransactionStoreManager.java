@@ -302,6 +302,7 @@ public class DatabaseTransactionStoreManager extends AbstractTransactionStoreMan
         globalTransactionDO.setTransactionName(globalSession.getTransactionName());
         globalTransactionDO.setTransactionServiceGroup(globalSession.getTransactionServiceGroup());
         globalTransactionDO.setApplicationData(globalSession.getApplicationData());
+        globalTransactionDO.setMaxRetryRollbackCount(globalSession.getMaxRetryRollbackCount());
         return globalTransactionDO;
     }
 
