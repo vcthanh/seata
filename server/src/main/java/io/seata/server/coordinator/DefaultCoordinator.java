@@ -286,6 +286,7 @@ public class DefaultCoordinator extends AbstractTCInboundHandler implements Tran
                 int maxRetryRollbackCount = rollbackingSession.getMaxRetryRollbackCount();
                 if(maxRetryRollbackCount > 0) {
                     rollbackingSession.setMaxRetryRollbackCount(maxRetryRollbackCount - 1);
+                    rollbackingSession.changeStatus(rollbackingSession.getStatus());
                     core.doGlobalRollback(rollbackingSession, true);
                 } else {
                     rollbackingSession.changeStatus(GlobalStatus.RollbackFailed);

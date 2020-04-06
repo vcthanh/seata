@@ -62,6 +62,7 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
                 ", beginTime=" + beginTime +
                 ", applicationData='" + applicationData + '\'' +
                 ", active=" + active +
+                ", maxRetryRollbackCount=" + maxRetryRollbackCount +
                 ", branchSessions=" + branchSessions +
                 ", globalSessionLock=" + globalSessionLock +
                 ", lifecycleListeners=" + lifecycleListeners +

@@ -442,6 +442,7 @@ public class LogStoreDataBaseDAO implements LogStore, Initialize {
         globalTransactionDO.setApplicationData(rs.getString(ServerTableColumnsName.GLOBAL_TABLE_APPLICATION_DATA));
         globalTransactionDO.setGmtCreate(rs.getTimestamp(ServerTableColumnsName.GLOBAL_TABLE_GMT_CREATE));
         globalTransactionDO.setGmtModified(rs.getTimestamp(ServerTableColumnsName.GLOBAL_TABLE_GMT_MODIFIED));
+        globalTransactionDO.setMaxRetryRollbackCount(rs.getInt(ServerTableColumnsName.GLOBAL_TABLE_MAX_RETRY_ROLLBACK_COUNT));
         return globalTransactionDO;
     }
 
