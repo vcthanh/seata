@@ -62,6 +62,7 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
                 ", beginTime=" + beginTime +
                 ", applicationData='" + applicationData + '\'' +
                 ", active=" + active +
+                ", maxRetryRollbackCount=" + maxRetryRollbackCount +
                 ", branchSessions=" + branchSessions +
                 ", globalSessionLock=" + globalSessionLock +
                 ", lifecycleListeners=" + lifecycleListeners +
@@ -90,6 +91,8 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
     private String applicationData;
 
     private boolean active = true;
+
+    private int maxRetryRollbackCount;
 
     private final ArrayList<BranchSession> branchSessions = new ArrayList<>();
 
@@ -330,6 +333,26 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
     }
 
     /**
+     * Instantiates a new Global session.
+     *
+     * @param applicationId           the application id
+     * @param transactionServiceGroup the transaction service group
+     * @param transactionName         the transaction name
+     * @param timeout                 the timeout
+     */
+    public GlobalSession(String applicationId, String transactionServiceGroup, String transactionName, int timeout, int maxRetryRollbackCount) {
+        this.transactionId = UUIDGenerator.generateUUID();
+        this.status = GlobalStatus.Begin;
+
+        this.applicationId = applicationId;
+        this.transactionServiceGroup = transactionServiceGroup;
+        this.transactionName = transactionName;
+        this.timeout = timeout;
+        this.maxRetryRollbackCount = maxRetryRollbackCount;
+        this.xid = XID.generateXID(transactionId);
+    }
+
+    /**
      * Gets transaction id.
      *
      * @return the transaction id
@@ -456,6 +479,24 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
     }
 
     /**
+     * Sets max retry rollback count.
+     *
+     * @param maxRetryRollbackCount the max retry rollback count
+     */
+    public void setMaxRetryRollbackCount(int maxRetryRollbackCount) {
+        this.maxRetryRollbackCount = maxRetryRollbackCount;
+    }
+
+    /**
+     * Gets max retry rollback count.
+     *
+     * @return the max retry rollback count
+     */
+    public int getMaxRetryRollbackCount() {
+        return maxRetryRollbackCount;
+    }
+
+    /**
      * Create global session global session.
      *
      * @param applicationId  the application id
@@ -467,6 +508,21 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
     public static GlobalSession createGlobalSession(String applicationId, String txServiceGroup, String txName,
                                                     int timeout) {
         GlobalSession session = new GlobalSession(applicationId, txServiceGroup, txName, timeout);
+        return session;
+    }
+
+    /**
+     * Create global session global session.
+     *
+     * @param applicationId  the application id
+     * @param txServiceGroup the tx service group
+     * @param txName         the tx name
+     * @param timeout        the timeout
+     * @return the global session
+     */
+    public static GlobalSession createGlobalSession(String applicationId, String txServiceGroup, String txName,
+                                                    int timeout, int maxRetryRollbackCount) {
+        GlobalSession session = new GlobalSession(applicationId, txServiceGroup, txName, timeout, maxRetryRollbackCount);
         return session;
     }
 

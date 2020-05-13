@@ -77,6 +77,10 @@ public class ServerTableColumnsName {
      */
     public static final String GLOBAL_TABLE_GMT_MODIFIED = "gmt_modified";
 
+    /**
+     * The constant global_table column name max_retry_rollback_count
+     */
+    public static final String GLOBAL_TABLE_MAX_RETRY_ROLLBACK_COUNT = "max_retry_rollback_count";
 
 
 

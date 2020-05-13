@@ -48,6 +48,8 @@ public class GlobalTransactionDO {
 
     private Date gmtModified;
 
+    private int maxRetryRollbackCount;
+
     /**
      * Gets xid.
      *
@@ -244,6 +246,24 @@ public class GlobalTransactionDO {
      */
     public void setGmtModified(Date gmtModified) {
         this.gmtModified = gmtModified;
+    }
+
+    /**
+     * Sets max retry rollback count.
+     *
+     * @param maxRetryRollbackCount the max retry rollback count
+     */
+    public void setMaxRetryRollbackCount(int maxRetryRollbackCount) {
+        this.maxRetryRollbackCount = maxRetryRollbackCount;
+    }
+
+    /**
+     * Gets max retry rollback count.
+     *
+     * @return the max retry rollback count
+     */
+    public int getMaxRetryRollbackCount() {
+        return maxRetryRollbackCount;
     }
 
     @Override

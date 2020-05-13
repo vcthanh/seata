@@ -268,6 +268,7 @@ public class DatabaseTransactionStoreManager extends AbstractTransactionStoreMan
         session.setStatus(GlobalStatus.get(globalTransactionDO.getStatus()));
         session.setApplicationData(globalTransactionDO.getApplicationData());
         session.setBeginTime(globalTransactionDO.getBeginTime());
+        session.setMaxRetryRollbackCount(globalTransactionDO.getMaxRetryRollbackCount());
         return session;
     }
 
@@ -302,6 +303,7 @@ public class DatabaseTransactionStoreManager extends AbstractTransactionStoreMan
         globalTransactionDO.setTransactionName(globalSession.getTransactionName());
         globalTransactionDO.setTransactionServiceGroup(globalSession.getTransactionServiceGroup());
         globalTransactionDO.setApplicationData(globalSession.getApplicationData());
+        globalTransactionDO.setMaxRetryRollbackCount(globalSession.getMaxRetryRollbackCount());
         return globalTransactionDO;
     }
 

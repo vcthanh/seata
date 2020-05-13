@@ -283,7 +283,15 @@ public class DefaultCoordinator extends AbstractTCInboundHandler implements Tran
                     continue;
                 }
                 rollbackingSession.addSessionLifecycleListener(SessionHolder.getRootSessionManager());
-                core.doGlobalRollback(rollbackingSession, true);
+                int maxRetryRollbackCount = rollbackingSession.getMaxRetryRollbackCount();
+                if(maxRetryRollbackCount > 0) {
+                    rollbackingSession.setMaxRetryRollbackCount(maxRetryRollbackCount - 1);
+                    rollbackingSession.changeStatus(rollbackingSession.getStatus());
+                    core.doGlobalRollback(rollbackingSession, true);
+                } else {
+                    rollbackingSession.changeStatus(GlobalStatus.RollbackFailed);
+                }
+
             } catch (TransactionException ex) {
                 LOGGER.info("Failed to retry rollbacking [{}] {} {}", rollbackingSession.getXid(), ex.getCode(),
                     ex.getMessage());
